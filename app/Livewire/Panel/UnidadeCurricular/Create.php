@@ -2,17 +2,19 @@
 
 namespace App\Livewire\Panel\UnidadeCurricular;
 
+use App\Models\AreaDeConhecimento;
 use App\Models\Curso;
 use App\Models\UnidadeCurricular;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Create extends Component
 {
-    public $cursos;
+    public $acs;
 
     public $name;
 
-    public $curso_id;
+    public $area_de_conhecimento;
 
     public $carga_horaria;
 
@@ -20,27 +22,44 @@ class Create extends Component
 
     public function mount()
     {
-        if (Curso::all()->isEmpty()) {
-            return redirect()->route('cursos.index')->with('error', 'Você precisa criar um curso antes de criar uma unidade curricular!');
+        if (AreaDeConhecimento::all()->isEmpty()) {
+            return redirect()->route('cursos.index')->with('error', 'Você precisa criar uma AC antes de criar uma unidade curricular!');
         }
 
-        $this->cursos = Curso::all();
+        $this->acs = AreaDeConhecimento::all();
 
-        $this->curso_id = $this->cursos->first()->id;
+        $this->area_de_conhecimento = $this->acs->first()->id;
     }
 
     public function store()
     {
-        UnidadeCurricular::create([
-            'name' => $this->name,
-            'description' => $this->description,
-            'curso_id' => $this->curso_id,
-            'duration' => $this->carga_horaria,
+        $selectedAc = AreaDeConhecimento::find($this->area_de_conhecimento);
+
+        $this->validate([
+            'name' => 'required',
+            'carga_horaria' => 'required',
+            'description' => 'required'
         ]);
 
-        Curso::find($this->curso_id)->update([
-            'duration' => Curso::find($this->curso_id)->duration + $this->carga_horaria
-        ]);
+        try {
+
+            DB::beginTransaction();
+
+            $selectedAc->unidadesCurriculares()->create([
+                'name' => $this->name,
+                'duration' => $this->carga_horaria,
+                'description' => $this->description
+            ]);
+
+            $selectedAc->curso()->update(['duration' => $selectedAc->curso()->sum('duration') + $this->carga_horaria]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return redirect()->route('ucs.index')->with('error', $e->getMessage());
+        }
 
         return redirect()->route('ucs.index')->with('success', 'Unidade Curricular criada com sucesso!');
     }

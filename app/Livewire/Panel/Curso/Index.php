@@ -15,7 +15,7 @@ class Index extends Component
 
     public function mount()
     {
-        $this->cursos = Curso::with('unidadesCurriculares')->get();
+        $this->cursos = Curso::with('areasDeConhecimento')->get();
     }
 
     public function delete($id)
@@ -23,9 +23,9 @@ class Index extends Component
         try {
             Curso::find($id)->delete();
 
-            $this->cursos = Curso::with('unidadesCurriculares')->get();
+            $this->cursos = Curso::with('areasDeConhecimento')->get();
         } catch (\Exception $e) {
-            return redirect()->route('cursos.index')->with('error', 'Delete as UCs associadas antes de deletar o curso ou altere o status para inativo.');
+            return redirect()->route('cursos.index')->with('error', 'Delete as ACs associadas antes de deletar o curso ou altere o status para inativo.');
         }
     }
 
@@ -36,7 +36,7 @@ class Index extends Component
         $curso->status = !$curso->status;
         $curso->save();
 
-        $this->cursos = Curso::with('unidadesCurriculares')->get();
+        $this->cursos = Curso::with('areasDeConhecimento')->get();
     }
 
     public function getCurso($id)

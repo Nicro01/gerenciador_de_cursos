@@ -12,8 +12,8 @@ class Curso extends Model
 
     protected $fillable = ['name', 'description', 'duration', 'status'];
 
-    public function unidadesCurriculares(): HasMany
+    public function areasDeConhecimento(): HasMany
     {
-        return $this->hasMany(UnidadeCurricular::class);
+        return $this->hasMany(AreaDeConhecimento::class);
     }
 }

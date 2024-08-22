@@ -10,10 +10,10 @@ class UnidadeCurricular extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'duration', 'curso_id', 'status'];
+    protected $fillable = ['name', 'description', 'duration', 'area_de_conhecimento_id', 'status'];
 
-    public function curso(): BelongsTo
+    public function areaDeConhecimento(): BelongsTo
     {
-        return $this->belongsTo(Curso::class);
+        return $this->belongsTo(AreaDeConhecimento::class);
     }
 }

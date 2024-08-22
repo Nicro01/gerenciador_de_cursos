@@ -16,6 +16,9 @@ use App\Livewire\Panel\Curso\Create as CursoCreate;
 use App\Livewire\Panel\UnidadeCurricular\Index as UCIndex;
 use App\Livewire\Panel\UnidadeCurricular\Create as UCCreate;
 
+use App\Livewire\Panel\AreaDeConhecimento\Index as ACIndex;
+use App\Livewire\Panel\AreaDeConhecimento\Create as ACCreate;
+
 use App\Livewire\Panel\Users\Index as UsersIndex;
 use App\Livewire\Panel\Users\Create as UsersCreate;
 
@@ -73,6 +76,14 @@ Route::middleware('auth')->group(function () {
             ->name('.index');
 
         Route::get('new/', UCCreate::class)
+            ->name('.create');
+    });
+
+    Route::prefix('ac')->name('ac')->group(function () {
+        Route::get('/', ACIndex::class)
+            ->name('.index');
+
+        Route::get('new/', ACCreate::class)
             ->name('.create');
     });
 
