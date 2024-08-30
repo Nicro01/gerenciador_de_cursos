@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('unidade_curriculars', function (Blueprint $table) {
+        Schema::create('pivot_ac_ucs', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->integer('duration');
-            $table->boolean('status')->default(true);
+            $table->foreignId('unidade_curricular_id')->constrained();
+            $table->foreignId('area_de_conhecimento_id')->constrained();
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('unidade_curriculars');
+        Schema::dropIfExists('pivot_ac_ucs');
     }
 };

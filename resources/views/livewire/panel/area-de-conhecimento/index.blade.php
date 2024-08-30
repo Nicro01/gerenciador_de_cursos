@@ -34,18 +34,16 @@
             <table class="w-full">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Cor</th>
-                        <th>Status</th>
-                        <th>Criado em</th>
-                        <th>Ação</th>
+                        <th class="pb-2">Nome</th>
+                        <th class="pb-2">Cor</th>
+                        <th class="pb-2">Status</th>
+                        <th class="pb-2">Criado em</th>
+                        <th class="pb-2">Ação</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($acs as $index => $ac)
-                        <tr class="border-y text-center transition-all duration-100 ease-linear hover:bg-neutral-100"
-                            wire:key="{{ $ac->id }}">
+                        <tr class="border-y bg-slate-100 text-center" wire:key="{{ $ac->id }}">
 
                             <td class="py-3">
                                 {{ $ac->id }}
@@ -88,6 +86,39 @@
                                 </button>
                             </td>
                         </tr>
+
+                        @foreach ($ac->unidadesCurriculares as $index => $uc)
+                            <tr class="border-y text-center text-neutral-700">
+
+                                @php
+                                    $item = \App\Models\UnidadeCurricular::find($uc->unidade_curricular_id);
+                                @endphp
+
+                                <td class="py-4">
+                                    {{ $item->name }}
+                                </td>
+
+                                <td class="py-4">
+                                    @if ($ac->unidadesCurriculares->count() > 0)
+                                        @php
+                                            $totalUC = 0;
+
+                                            foreach ($ac->unidadesCurriculares as $uc) {
+                                                $totalUC += \App\Models\UnidadeCurricular::find(
+                                                    $uc->unidade_curricular_id,
+                                                )->duration;
+                                            }
+                                        @endphp
+
+                                        {{ $totalUC }}
+                                        Horas
+                                    @else
+                                        Nenhuma UC Cadastrada
+                                    @endif
+                                </td>
+
+                            </tr>
+                        @endforeach
                     @endforeach
                 </tbody>
             </table>

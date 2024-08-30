@@ -4,6 +4,7 @@ namespace App\Livewire\Panel\UnidadeCurricular;
 
 use App\Models\AreaDeConhecimento;
 use App\Models\Curso;
+use App\Models\PivotAcUc;
 use App\Models\UnidadeCurricular;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -32,17 +33,27 @@ class Index extends Component
 
     public function delete($id)
     {
-        $uc = UnidadeCurricular::find($id)->areaDeConhecimento()->first();
+        $uc = UnidadeCurricular::find($id)->areaDeConhecimento()->get();
 
-        //dd($uc->curso()->get());
+        $uc_id = UnidadeCurricular::find($id)->areaDeConhecimento()->first()->unidade_curricular_id;
 
-        $uc->curso()->update([
-            'duration' => $uc->curso()->first()->duration - UnidadeCurricular::find($id)->duration
-        ]);
+        //dd($uc);
 
-        $uc->save();
+        foreach ($uc as $u) {
 
-        UnidadeCurricular::find($id)->delete();
+            $ac = AreaDeConhecimento::find($u->area_de_conhecimento_id)->first();
+
+            //dd(UnidadeCurricular::find($u->unidade_curricular_id), $u->unidade_curricular_id);
+
+            Curso::find($ac->curso_id)->update([
+                'duration' => Curso::find($ac->curso_id)->duration - UnidadeCurricular::find($u->unidade_curricular_id)->duration
+            ]);
+
+            PivotAcUc::where('unidade_curricular_id', $u->unidade_curricular_id)->delete();
+        }
+
+        UnidadeCurricular::find($uc_id)->delete();
+
 
         session()->flash('success', 'Unidade Curricular deletada com sucesso!');
 

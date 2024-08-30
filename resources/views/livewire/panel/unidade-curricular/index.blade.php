@@ -35,7 +35,6 @@
             <table class="w-full">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Nome</th>
                         <th>Duração</th>
                         <th>Status</th>
@@ -47,10 +46,6 @@
                     @foreach ($ucs as $index => $uc)
                         <tr class="border-y text-center transition-all duration-100 ease-linear hover:bg-neutral-100"
                             wire:key="{{ $uc->id }}">
-
-                            <td class="py-3">
-                                {{ $uc->id }}
-                            </td>
 
                             <td class="py-3">
                                 {{ $uc->name }}

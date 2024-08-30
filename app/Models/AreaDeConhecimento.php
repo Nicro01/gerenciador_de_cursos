@@ -24,6 +24,6 @@ class AreaDeConhecimento extends Model
 
     public function unidadesCurriculares(): HasMany
     {
-        return $this->hasMany(UnidadeCurricular::class);
+        return $this->hasMany(PivotAcUc::class);
     }
 }

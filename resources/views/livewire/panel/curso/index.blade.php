@@ -34,24 +34,16 @@
             <table class="w-full">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Duração</th>
-                        <th>ACs</th>
-                        <th>Status</th>
-                        <th>Criado em</th>
-                        <th>Ação</th>
+                        <th class="pb-2">Nome</th>
+                        <th class="pb-2">Duração</th>
+                        <th class="pb-2">Status</th>
+                        <th class="pb-2">Criado em</th>
+                        <th class="pb-2">Ação</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($cursos as $index => $curso)
-                        <tr class="border-y text-center transition-all duration-100 ease-linear hover:bg-neutral-100"
-                            wire:key="{{ $curso->id }}">
-
-                            <td class="py-3">
-                                {{ $curso->id }}
-                            </td>
-
+                        <tr class="border-y bg-slate-100 text-center" wire:key="{{ $curso->id }}">
                             <td class="py-3">
                                 {{ $curso->name }}
                             </td>
@@ -61,33 +53,6 @@
                                     Indefinido
                                 @else
                                     {{ $curso->duration }} Horas
-                                @endif
-                            </td>
-
-                            <td class="select-none py-3">
-                                @if (!$curso->areasDeConhecimento->isEmpty())
-                                    <span class="cursor-pointer rounded-lg bg-green-500 px-2 py-1 text-white"
-                                        x-data="{ open: false }" x-on:click="open = true">Ver
-                                        UCs
-
-                                        <div x-show="open"
-                                            class="absolute inset-0 z-10 flex h-screen w-screen items-center justify-center bg-neutral-600 bg-opacity-30">
-                                            <div class="min-h-[70%] min-w-[40%] cursor-default rounded-lg bg-white p-5 shadow-lg"
-                                                x-on:click.away="open = false">
-                                                <h2 class="mb-10 text-2xl font-bold text-neutral-700">Áreas de
-                                                    Conhecimento do
-                                                    Curso
-                                                </h2>
-                                                @foreach ($curso->areasDeConhecimento as $uc)
-                                                    <span
-                                                        class="rounded-lg bg-green-500 px-2 py-1 text-white">{{ $uc->name }}</span>
-                                                @endforeach
-
-                                            </div>
-                                        </div>
-                                    </span>
-                                @else
-                                    <span class="rounded-lg bg-red-500 px-2 py-1 text-white">Nenhuma AC</span>
                                 @endif
                             </td>
 
@@ -163,6 +128,32 @@
                                 </div>
                             </td>
                         </tr>
+
+                        @foreach ($curso->areasDeConhecimento as $index => $ac)
+                            <tr class="border-y text-center text-neutral-700">
+                                <td class="py-4">
+                                    {{ $ac->name }}
+                                </td>
+                                <td class="py-4">
+                                    @if ($ac->unidadesCurriculares->count() > 0)
+                                        @php
+                                            $totalUC = 0;
+
+                                            foreach ($ac->unidadesCurriculares as $uc) {
+                                                $totalUC += \App\Models\UnidadeCurricular::find(
+                                                    $uc->unidade_curricular_id,
+                                                )->duration;
+                                            }
+                                        @endphp
+
+                                        {{ $totalUC }}
+                                        Horas
+                                    @else
+                                        Nenhuma UC Cadastrada
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
                     @endforeach
                 </tbody>
             </table>

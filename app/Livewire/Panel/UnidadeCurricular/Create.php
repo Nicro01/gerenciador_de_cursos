@@ -14,7 +14,11 @@ class Create extends Component
 
     public $name;
 
+    public $search;
+
     public $area_de_conhecimento;
+
+    public $selectedAcs = [];
 
     public $carga_horaria;
 
@@ -33,35 +37,61 @@ class Create extends Component
 
     public function store()
     {
-        $selectedAc = AreaDeConhecimento::find($this->area_de_conhecimento);
-
         $this->validate([
             'name' => 'required',
             'carga_horaria' => 'required',
-            'description' => 'required'
+            'description' => 'required',
+            'selectedAcs' => 'required'
         ]);
 
         try {
 
             DB::beginTransaction();
 
-            $selectedAc->unidadesCurriculares()->create([
+
+            $uc = UnidadeCurricular::create([
                 'name' => $this->name,
+                'description' => $this->description,
                 'duration' => $this->carga_horaria,
-                'description' => $this->description
             ]);
 
-            $selectedAc->curso()->update(['duration' => $selectedAc->curso()->sum('duration') + $this->carga_horaria]);
+            foreach ($this->selectedAcs as $ac) {
+                $selectedAc = AreaDeConhecimento::find($ac);
+
+                $selectedAc->unidadesCurriculares()->create([
+                    'unidade_curricular_id' => $uc->id,
+                ]);
+
+                $selectedAc->curso()->update(['duration' => $selectedAc->curso()->sum('duration') + $this->carga_horaria]);
+            }
 
             DB::commit();
         } catch (\Exception $e) {
-
             DB::rollBack();
 
             return redirect()->route('ucs.index')->with('error', $e->getMessage());
         }
 
         return redirect()->route('ucs.index')->with('success', 'Unidade Curricular criada com sucesso!');
+    }
+
+    public function updatedSearch()
+    {
+        $this->acs = AreaDeConhecimento::where('name', 'like', '%' . $this->search . '%')->limit(5)->get();
+    }
+
+    public function selectAc(AreaDeConhecimento $ac)
+    {
+        if ($this->selectedAcs && in_array($ac->id, $this->selectedAcs)) {
+
+            $item = array_search($ac->id, $this->selectedAcs);
+
+            unset($this->selectedAcs[$item]);
+
+            return;
+        }
+
+        $this->selectedAcs[] = $ac->id;
     }
 
     public function render()
